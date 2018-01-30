@@ -22,7 +22,7 @@ class DQNAgent:
         self.epsilon = 1.0 # exploration rate
         self.epsilon_min = 0.01 # minimum exploration rate
         self.epsilon_decay = 0.998
-        self.learning_rate = 0.001 # used for gradient descent
+        self.learning_rate = 0.01 # used for gradient descent
         self.model = self._build_model_two()
 
     def _build_model(self):
@@ -98,7 +98,8 @@ class DQNAgent:
         t = [p>=0.5]
         t = np.array(t)[0]
         print(t)
-        return t.astype(int)
+        #return t.astype(int)
+        return self.button_map[0]
 
     def replay(self, batch_size):
         # Picks random instance from the memory list and batches
@@ -155,8 +156,9 @@ if __name__ == "__main__":
 
 
     button_maps = [
+
             [0,0,0,1,1,1], #12 - right run jump
-           [0,0,0,0,0,0],
+            [0,0,0,0,0,0],
             [1,0,0,0,0,0], #1 - up only (to climb vine)
             [0,1,0,0,0,0], #2 - left only
             [0,0,1,0,0,0], #3 - down only (duck, down pipe)
@@ -168,8 +170,8 @@ if __name__ == "__main__":
             [0,0,0,1,1,0], #9 - right run
             [0,0,0,1,0,1], #10 - right jump
             [0,1,0,0,1,1], #11 - left run jump
-
             [0,0,1,0,0,1], #13 - down jump
+            
     ]
 
     button_maps2 = [
@@ -179,9 +181,9 @@ if __name__ == "__main__":
     state_size = (84,84,1)
     action_size = env.action_space.shape
     # create agent
-    agent = DQNAgent(state_size, button_maps2,action_size)
-    agent.load("mario_dqn_temp.h5")
-    agent.load_list("button_maps.pkl")
+    agent = DQNAgent(state_size, button_maps,action_size)
+    agent.load("mario_dqn_temp4.h5")
+    #agent.load_list("button_maps.pkl")
 
     print(type(state_size))
     print(state_size)
@@ -234,7 +236,7 @@ if __name__ == "__main__":
             if done:
                 #print("It's done!")
                 done = False
-                with open("performance3.txt", "a") as text_file:
+                with open("performance5.txt", "a") as text_file:
                     print("episode: {}/{}, score: {} e: {:.2}"
                         .format(e,EPISODES,total_score,agent.epsilon),
                         file=text_file)
@@ -245,5 +247,5 @@ if __name__ == "__main__":
             print("finished")
 
         if e % 10 == 0:
-            agent.save("mario_dqn_temp2.h5")
-            agent.save_list("button_maps.pkl")
+            agent.save("mario_dqn_temp5.h5")
+            agent.save_list("button_maps3.pkl")
