@@ -13,16 +13,17 @@ EPISODES = 1000
 
 class DQNAgent:
     def __init__(self, state_size,button_map,action_size):
-        # This initial
+        # This is initial
         self.state_size = state_size
         self.action_size = action_size
         self.button_map = button_map
         self.memory = deque()
+
         ###Parameters
         self.gamma=0.95 # discount rate
-        self.epsilon = 1.0 # exploration rate
-        self.epsilon_min = 0.001 # minimum exploration rate
-        self.epsilon_decay = 0.999
+        self.epsilon = .99 # exploration rate
+        self.epsilon_min = 0.1 # minimum exploration rate
+        self.epsilon_decay = 0.99
         self.learning_rate = 0.01 # used for gradient descent
         self.model = self._build_model_two()
 
@@ -66,6 +67,7 @@ class DQNAgent:
         # next_state is the next frame
         # done is a boolean on whether or not the game is finished
         # for one episdoe
+
         self.memory.append((state,action,reward,next_state,done))
 
 
@@ -76,10 +78,11 @@ class DQNAgent:
         # 6, we will want to generate a random array
         # of bits i.e. [0,0,0,1,1,0]
         # MultiDiscrete is used for represented buttons
+
         if np.random.rand() <= self.epsilon:
             #use for random button input
             move = np.random.randint(2, size=6)
-            self.button_map.append(move)
+            #self.button_map.append(move)
             return move
             '''item = np.random.randint(2, size=6)
             temp = []
@@ -109,9 +112,11 @@ class DQNAgent:
         #return t.astype(int)
         return self.button_map[0]
 
+
     def replay(self, batch_size):
         # Picks random instance from the memory list and batches
         # over it (trains over the past instance).
+
         minibatch = random.sample(self.memory, batch_size)
         for state, action, reward, next_state, done in minibatch:
             target = reward
@@ -161,8 +166,10 @@ if __name__ == "__main__":
     # Initialize gym environment
     # Creates the connection between the emulator and the
     # coding environment
+
     env = gym.make('SuperMarioBros-1-1-v0')
 
+    # button map for mario
     button_maps = [
 
             [0,0,0,1,1,1], #12 - right run jump
@@ -186,11 +193,12 @@ if __name__ == "__main__":
         [0,0,0,0,0,0], #0 - no button
     ]
 
+    # preprocessing for CNN
     state_size = (84,84,1)
     action_size = env.action_space.shape
     # create agent
     agent = DQNAgent(state_size, button_maps,action_size)
-    agent.load("mario_dqn_temp4.h5")
+    agent.load("mario_dqn_temp5.h5")
     #agent.load_list("button_maps.pkl")
 
     print(type(state_size))
@@ -217,6 +225,7 @@ if __name__ == "__main__":
         while not done:
             #env.render()
             #print(type(state))
+
             # Decide action
             action = agent.act(state)
             #print((action))
@@ -230,9 +239,8 @@ if __name__ == "__main__":
             next_state = preprocess(next_state)
             next_state = np.reshape(next_state, state_size)
             next_state = np.expand_dims(next_state,axis=0)
-            #print(next_state.shape)
-            #next_state = np.expand_dims(state,axis=0)
-            #print(next_state.shape)
+
+
             # Remember the previous state, action, reward, and done
             agent.remember(state,action,reward,next_state,done)
 
@@ -254,6 +262,7 @@ if __name__ == "__main__":
             agent.replay(batch_size)
             print("finished")
 
-        if e % 10 == 0:
+        # saves model
+        if e % 5 == 0:
             agent.save("mario_dqn_temp5.h5")
-            agent.save_list("button_maps3.pkl")
+            #agent.save_list("button_maps3.pkl")
